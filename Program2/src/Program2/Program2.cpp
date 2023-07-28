@@ -8,7 +8,7 @@ void Program2::run() {
             std::string data = networkConnecter_.receiveData(clientSocket);
             networkConnecter_.closeConnection(clientSocket);
 
-            // TODO() : process data
+            dataProcessor_.process(data);
         }
     }
 }

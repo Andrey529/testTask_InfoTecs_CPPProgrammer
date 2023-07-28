@@ -3,16 +3,20 @@
 
 
 #include "../NetworkConnecter/NetworkConnecter.h"
+#include "../DataProcessor/DataProcessor.h"
 
 class Program2 {
 public:
-    Program2(const std::string &serverIpAddress, const int serverPort) : networkConnecter_(serverIpAddress, serverPort) { }
+    Program2(const std::string &serverIpAddress, const int serverPort) : networkConnecter_(serverIpAddress, serverPort),
+                                                                         dataProcessor_() {}
 
     ~Program2() = default;
 
     void run();
+
 private:
     NetworkConnecter networkConnecter_;
+    DataProcessor dataProcessor_;
 };
 
 
