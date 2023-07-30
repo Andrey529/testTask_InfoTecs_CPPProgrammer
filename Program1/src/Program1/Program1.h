@@ -1,67 +1,34 @@
 #ifndef PROGRAM1_PROGRAM1_H
 #define PROGRAM1_PROGRAM1_H
 
+
 #include <iostream>
 #include <string>
 #include <thread>
+#include <condition_variable>
+
 #include "../DataProcessor/DataProcessor.h"
 #include "../SharedBuffer/SharedBuffer.h"
+#include "../NetworkConnecter/NetworkConnecter.h"
+
 
 class Program1 {
 public:
-    Program1() : dataProcessor_(), sharedBuffer_() {}
+    Program1(const std::string &program2Ip, const int &program2Port)
+            : program2Ip_(program2Ip), program2Port_(program2Port), sharedBuffer_(), mutex_(), cv_() {}
 
-    void run() {
-        std::thread inputThread(&Program1::inputThreadFunction, this);
-        std::thread sendingThread(&Program1::sendingThreadFunction, this);
-
-        inputThread.join();
-    }
+    void run();
 
 private:
-    void inputThreadFunction() {
-        while (true) {
-            // user input
-            std::string input;
-            std::cout << "Input string: ";
-            std::cin >> input;
+    void inputThreadFunction();
 
-            // check that the entered string consists only of digits
-            // and that its length does not exceed 64
-            if (dataProcessor_.isValid(input)) {
-                // sort the string in descending order
-                // and replace all even digits with "KB" characters
-                dataProcessor_.processData(input);
+    void sendingThreadFunction();
 
-                // paste the entered string into the synchronized buffer
-                sharedBuffer_.setData(input);
-            } else {
-                std::cout << "Error: incorrect data entered!" << std::endl;
-            }
-        }
-    }
-
-    void sendingThreadFunction() {
-        while (true) {
-            std::string data = sharedBuffer_.getData();
-
-            // output of received data from the buffer to the screen
-            std::cout << "Buffered data: " << data << std::endl;
-
-            // calculation the total sum of all elements that are numeric values
-            int sum = 0;
-            for (const auto &ch : data) {
-                if (std::isdigit(ch)) {
-                    sum += ch - '0';
-                }
-            }
-
-            // TODO(): передать рассчитанную сумму в Программу №2 через сокеты
-        }
-    }
-
-    DataProcessor dataProcessor_;
+    std::string program2Ip_;
+    int program2Port_;
     SharedBuffer sharedBuffer_;
+    std::mutex mutex_;
+    std::condition_variable cv_;
 };
 
 

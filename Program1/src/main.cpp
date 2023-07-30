@@ -1,23 +1,9 @@
-#include <iostream>
-#include <thread>
-#include "SharedBuffer/SharedBuffer.h"
-
-void readData(SharedBuffer &sharedBuffer) {
-    std::string data = sharedBuffer.getData();
-    std::cout << data << std::endl;
-}
-
-void writeData(SharedBuffer &sharedBuffer) {
-    std::string data = "123";
-    sharedBuffer.setData(data);
-}
+#include "Program1/Program1.h"
 
 int main() {
-    SharedBuffer sharedBuffer;
-    std::thread t1(writeData, std::ref(sharedBuffer));
-    std::thread t2(readData, std::ref(sharedBuffer));
-
-    t1.join();
-    t2.join();
-
+    std::string program2Ip = "127.0.0.1";
+    int program2Port = 12345;
+    Program1 program1(program2Ip, program2Port);
+    program1.run();
+    return 0;
 }

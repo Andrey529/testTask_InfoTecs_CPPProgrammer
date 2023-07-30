@@ -1,6 +1,7 @@
 #ifndef PROGRAM1_DATAPROCESSOR_H
 #define PROGRAM1_DATAPROCESSOR_H
 
+
 #include <string>
 
 class DataProcessor {

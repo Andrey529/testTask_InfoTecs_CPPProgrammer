@@ -1,7 +1,7 @@
 #ifndef PROGRAM1_SHAREDBUFFER_H
 #define PROGRAM1_SHAREDBUFFER_H
 
-#include <mutex>
+
 #include <string>
 
 class SharedBuffer {
@@ -11,10 +11,9 @@ public:
 
     void setData(const std::string &data);
     std::string getData();
-
+    bool isEmpty() const;
 private:
     std::string buffer_;
-    std::mutex mutex_;
 };
 
 
