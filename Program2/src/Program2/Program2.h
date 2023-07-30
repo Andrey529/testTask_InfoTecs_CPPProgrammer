@@ -7,7 +7,7 @@
 
 class Program2 {
 public:
-    Program2(const std::string &serverIpAddress, const int serverPort) : networkConnecter_(serverIpAddress, serverPort),
+    Program2(const std::string &ipAddress, const int port) : networkConnecter_(ipAddress, port),
                                                                          dataProcessor_() {}
 
     ~Program2() = default;

@@ -12,7 +12,7 @@
 
 class NetworkConnecter {
 public:
-    NetworkConnecter(const std::string &serverIpAddress, const int serverPort);
+    NetworkConnecter(const std::string &ipAddress, const int &port);
 
     ~NetworkConnecter();
 
@@ -23,9 +23,9 @@ public:
     void closeConnection(int socket);
 
 private:
-    std::string serverIpAddress_;
-    int serverPort_;
-    int serverSocket_;
+    std::string ipAddress_;
+    int port_;
+    int socket_;
     static const int bufferSize_ = 1024;
 };
 

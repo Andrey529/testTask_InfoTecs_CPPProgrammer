@@ -1,71 +1,71 @@
 #include "NetworkConnecter.h"
 
-NetworkConnecter::NetworkConnecter(const std::string &serverIpAddress, const int serverPort)
-        : serverIpAddress_(serverIpAddress), serverPort_(serverPort) {
+NetworkConnecter::NetworkConnecter(const std::string &ipAddress, const int &port)
+        : ipAddress_(ipAddress), port_(port) {
 
-    if (serverPort_ < 1024 || serverPort_ > 65535) {
+    if (port_ < 1024 || port_ > 65535) {
         std::cerr << "Invalid port number. Port must be in [1024; 65535]" << std::endl;
         exit(1);
     }
 
     int status;
     struct addrinfo hints = {};
-    struct addrinfo *servinfo;
+    struct addrinfo *servinfo, *p;
 
     std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    status = getaddrinfo(serverIpAddress_.c_str(), std::to_string(serverPort_).c_str(), &hints, &servinfo);
+    status = getaddrinfo(ipAddress_.c_str(), std::to_string(port_).c_str(), &hints, &servinfo);
 
     if (status != 0) {
         std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
         exit(1);
     }
 
-    std::cout << "Ip address = " << serverIpAddress_ << " , port = " << serverPort_ << std::endl;
+    std::cout << "Ip address = " << ipAddress_ << " , port = " << port_ << std::endl;
 
-    for (auto p = servinfo; p != nullptr; p = p->ai_next) {
+    for (p = servinfo; p != nullptr; p = p->ai_next) {
 
-        serverSocket_ = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-        if (serverSocket_ == -1) {
-            std::cerr << "Server socket error: continue. Error number = " << errno << std::endl;
+        socket_ = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (socket_ == -1) {
+            std::cerr << "Program2 socket error: continue. Error number = " << errno << std::endl;
             continue;
         }
 
         int yes = 1;
-        if (setsockopt(serverSocket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-            std::cerr << "Error: setsockopt" << std::endl;
+        if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+            std::cerr << "Program2 Error: setsockopt" << std::endl;
             exit(1);
         }
 
-        status = bind(serverSocket_, p->ai_addr, p->ai_addrlen);
+        status = bind(socket_, p->ai_addr, p->ai_addrlen);
         if (status == -1) {
-            std::cerr << "Server bind error: continue. Error number = " << errno << std::endl;
+            std::cerr << "Program2 bind error: continue. Error number = " << errno << std::endl;
             continue;
         }
 
         break;
     }
 
-    if (servinfo == nullptr) {
-        std::cerr << "Server failed to bind" << std::endl;
-        close(serverSocket_);
+    if (p == nullptr) {
+        std::cerr << "Program2 failed to bind" << std::endl;
+        close(socket_);
         exit(1);
     }
 
     freeaddrinfo(servinfo);
 
-    status = listen(serverSocket_, 20);
+    status = listen(socket_, 20);
     if (status == -1) {
         std::cerr << "Error listen" << std::endl;
-        close(serverSocket_);
+        close(socket_);
         exit(1);
     }
 }
 
 NetworkConnecter::~NetworkConnecter() {
-    close(serverSocket_);
+    close(socket_);
 }
 
 int NetworkConnecter::acceptConnection() {
@@ -73,7 +73,7 @@ int NetworkConnecter::acceptConnection() {
     socklen_t sin_size;
 
     sin_size = sizeof(their_address);
-    int clientSocket = accept(serverSocket_, (struct sockaddr *) &their_address, &sin_size);
+    int clientSocket = accept(socket_, (struct sockaddr *) &their_address, &sin_size);
     if (clientSocket == -1) {
         std::cerr << "Accept error, continue" << std::endl;
         return -1;
@@ -84,9 +84,9 @@ int NetworkConnecter::acceptConnection() {
 
 std::string NetworkConnecter::receiveData(int clientSocket) {
     char buffer[bufferSize_] = {};
-    ssize_t bytesReceived = read(clientSocket, buffer, bufferSize_);
+    ssize_t bytesReceived = recv(clientSocket, buffer, bufferSize_, 0);
     if (bytesReceived <= 0) {
-        std::cerr << "Failed to read bytes from client socket connection" << std::endl;
+        std::cerr << "Failed to read bytes from program1 socket connection" << std::endl;
         return "";
     }
 
