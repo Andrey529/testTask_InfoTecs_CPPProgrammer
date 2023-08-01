@@ -4,8 +4,9 @@
 
 #include "../NetworkConnecter/NetworkConnecter.h"
 #include "../DataProcessor/DataProcessor.h"
+#include "Logger/Loggable.h"
 
-class Program2 {
+class Program2 : public Loggable {
 public:
     Program2(const std::string &ipAddress, const int port) : networkConnecter_(ipAddress, port),
                                                                          dataProcessor_() {}

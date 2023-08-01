@@ -3,8 +3,9 @@
 
 
 #include <string>
+#include "Logger/Loggable.h"
 
-class DataProcessor {
+class DataProcessor : public Loggable {
 public:
     bool isValid(const std::string &data);
     void processData(std::string &data);

@@ -10,9 +10,9 @@
 #include "../DataProcessor/DataProcessor.h"
 #include "../SharedBuffer/SharedBuffer.h"
 #include "../NetworkConnecter/NetworkConnecter.h"
+#include "Logger/Loggable.h"
 
-
-class Program1 {
+class Program1 : public Loggable {
 public:
     Program1(const std::string &program2Ip, const int &program2Port)
             : program2Ip_(program2Ip), program2Port_(program2Port), sharedBuffer_(), mutex_(), cv_() {}

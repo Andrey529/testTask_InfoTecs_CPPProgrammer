@@ -4,7 +4,7 @@ NetworkConnecter::NetworkConnecter(const std::string &ipAddress, const int &port
         : ipAddress_(ipAddress), port_(port) {
 
     if (port_ < 1024 || port_ > 65535) {
-        std::cerr << "Invalid port number. Port must be in [1024; 65535]" << std::endl;
+        logger_->error("NetworkConnecter::NetworkConnecter: Invalid port number. Port must be in [1024; 65535]");
         exit(1);
     }
 
@@ -19,29 +19,29 @@ NetworkConnecter::NetworkConnecter(const std::string &ipAddress, const int &port
     status = getaddrinfo(ipAddress_.c_str(), std::to_string(port_).c_str(), &hints, &servinfo);
 
     if (status != 0) {
-        std::cerr << "getaddrinfo error: " << gai_strerror(status) << std::endl;
+        logger_->error("NetworkConnecter::NetworkConnecter: getaddrinfo error: " + std::string(gai_strerror(status)));
         exit(1);
     }
 
-    std::cout << "Ip address = " << ipAddress_ << " , port = " << port_ << std::endl;
+    logger_->info("NetworkConnecter::NetworkConnecter: Ip address = " + ipAddress_ + " , port = " + std::to_string(port_));
 
     for (p = servinfo; p != nullptr; p = p->ai_next) {
 
         socket_ = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         if (socket_ == -1) {
-            std::cerr << "Program2 socket error: continue. Error number = " << errno << std::endl;
+            logger_->error("NetworkConnecter::NetworkConnecter: Program2 socket error continue. Error number = " + std::to_string(errno));
             continue;
         }
 
         int yes = 1;
         if (setsockopt(socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-            std::cerr << "Program2 Error: setsockopt" << std::endl;
+            logger_->error("NetworkConnecter::NetworkConnecter: Program2 error setsockopt");
             exit(1);
         }
 
         status = bind(socket_, p->ai_addr, p->ai_addrlen);
         if (status == -1) {
-            std::cerr << "Program2 bind error: continue. Error number = " << errno << std::endl;
+            logger_->error("NetworkConnecter::NetworkConnecter: Program2 bind error - continue. Error number = " + std::to_string(errno));
             continue;
         }
 
@@ -49,7 +49,7 @@ NetworkConnecter::NetworkConnecter(const std::string &ipAddress, const int &port
     }
 
     if (p == nullptr) {
-        std::cerr << "Program2 failed to bind" << std::endl;
+        logger_->error("NetworkConnecter::NetworkConnecter: Program2 failed to bind");
         close(socket_);
         exit(1);
     }
@@ -58,13 +58,16 @@ NetworkConnecter::NetworkConnecter(const std::string &ipAddress, const int &port
 
     status = listen(socket_, 20);
     if (status == -1) {
-        std::cerr << "Error listen" << std::endl;
+        logger_->error("NetworkConnecter::NetworkConnecter: Error listen");
         close(socket_);
         exit(1);
     }
+
+    logger_->info("NetworkConnecter::NetworkConnecter: Success");
 }
 
 NetworkConnecter::~NetworkConnecter() {
+    logger_->info("NetworkConnecter::~NetworkConnecter");
     close(socket_);
 }
 
@@ -75,10 +78,11 @@ int NetworkConnecter::acceptConnection() {
     sin_size = sizeof(their_address);
     int clientSocket = accept(socket_, (struct sockaddr *) &their_address, &sin_size);
     if (clientSocket == -1) {
-        std::cerr << "Accept error, continue" << std::endl;
+        logger_->error("NetworkConnecter::acceptConnection: Accept error");
         return -1;
     }
 
+    logger_->info("NetworkConnecter::acceptConnection: Accepted new connection");
     return clientSocket;
 }
 
@@ -86,15 +90,17 @@ std::string NetworkConnecter::receiveData(int clientSocket) {
     char buffer[bufferSize_] = {};
     ssize_t bytesReceived = recv(clientSocket, buffer, bufferSize_, 0);
     if (bytesReceived <= 0) {
-        std::cerr << "Failed to read bytes from program1 socket connection" << std::endl;
+        logger_->error("NetworkConnecter::receiveData: Failed to read bytes from program1 socket connection");
         return "";
     }
 
     buffer[bytesReceived] = '\0';
     std::string dataReceived(buffer);
+    logger_->info("NetworkConnecter::receiveData: Received new data = " + dataReceived);
     return dataReceived;
 }
 
 void NetworkConnecter::closeConnection(int socket) {
+    logger_->info("NetworkConnecter::closeConnection");
     close(socket);
 }

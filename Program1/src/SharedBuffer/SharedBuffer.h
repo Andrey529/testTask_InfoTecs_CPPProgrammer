@@ -3,8 +3,9 @@
 
 
 #include <string>
+#include "Logger/Loggable.h"
 
-class SharedBuffer {
+class SharedBuffer : public Loggable {
 public:
     SharedBuffer() = default;
     ~SharedBuffer() = default;

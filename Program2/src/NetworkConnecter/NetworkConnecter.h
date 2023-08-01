@@ -10,7 +10,9 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 
-class NetworkConnecter {
+#include "Logger/Loggable.h"
+
+class NetworkConnecter : public Loggable {
 public:
     NetworkConnecter(const std::string &ipAddress, const int &port);
 

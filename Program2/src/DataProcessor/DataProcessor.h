@@ -5,7 +5,9 @@
 #include <string>
 #include <iostream>
 
-class DataProcessor {
+#include "Logger/Loggable.h"
+
+class DataProcessor : public Loggable {
 public:
     void process(const std::string &data);
 };

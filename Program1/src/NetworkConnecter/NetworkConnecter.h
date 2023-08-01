@@ -11,8 +11,9 @@
 
 #include <chrono>
 #include <thread>
+#include "Logger/Loggable.h"
 
-class NetworkConnecter {
+class NetworkConnecter : public Loggable {
 public:
     NetworkConnecter(const std::string &serverIp, const int &serverPort);
 
